@@ -15,6 +15,13 @@ class QrCodeAnalyzer : ImageAnalysis.Analyzer {
 
     private val yuvFormats = mutableListOf(YUV_420_888)
 
+    private val reader = MultiFormatReader().apply {
+        val map = mapOf(
+            DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)
+        )
+        setHints(map)
+    }
+
     init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             yuvFormats.addAll(listOf(YUV_420_888, YUV_420_888))
@@ -28,10 +35,4 @@ class QrCodeAnalyzer : ImageAnalysis.Analyzer {
         }
     }
 
-    private val reader = MultiFormatReader().apply {
-        val map = mapOf(
-            DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)
-        )
-        setHints(map)
-    }
 }
