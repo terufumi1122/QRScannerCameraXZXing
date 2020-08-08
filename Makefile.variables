@@ -1,0 +1,5 @@
+################################################################################
+# 変数(.gitignore)
+################################################################################
+IGNORE_LIST    := intellij+all,linux,macos,vim,android,kotlin
+GIT_IGNORE_URL := https://www.toptal.com/developers/gitignore/api/$(IGNORE_LIST)
