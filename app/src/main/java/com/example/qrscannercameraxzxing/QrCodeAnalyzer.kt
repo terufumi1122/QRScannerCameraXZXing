@@ -5,6 +5,9 @@ import android.os.Build
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.DecodeHintType
+import com.google.zxing.MultiFormatReader
 
 private val TAG = QrCodeAnalyzer::class.java.simpleName
 
@@ -23,5 +26,12 @@ class QrCodeAnalyzer : ImageAnalysis.Analyzer {
             Log.e(TAG, "Expected YUV, now = ${image.format}")
             return
         }
+    }
+
+    private val reader = MultiFormatReader().apply {
+        val map = mapOf(
+            DecodeHintType.POSSIBLE_FORMATS to arrayListOf(BarcodeFormat.QR_CODE)
+        )
+        setHints(map)
     }
 }
