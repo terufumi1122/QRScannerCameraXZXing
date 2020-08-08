@@ -8,6 +8,7 @@ import androidx.camera.core.ImageProxy
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.DecodeHintType
 import com.google.zxing.MultiFormatReader
+import java.nio.ByteBuffer
 
 private val TAG = QrCodeAnalyzer::class.java.simpleName
 
@@ -28,11 +29,19 @@ class QrCodeAnalyzer : ImageAnalysis.Analyzer {
         }
     }
 
+    private fun ByteBuffer.toByteArray(): ByteArray {
+        rewind()
+        val data = ByteArray(remaining())
+        get(data)
+        return data
+    }
+
     override fun analyze(image: ImageProxy) {
         if (image.format !in yuvFormats) {
             Log.e(TAG, "Expected YUV, now = ${image.format}")
             return
         }
+
     }
 
 }
