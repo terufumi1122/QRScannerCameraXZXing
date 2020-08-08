@@ -5,16 +5,30 @@ import android.os.Build
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.DecodeHintType
-import com.google.zxing.MultiFormatReader
+import com.google.zxing.*
+import com.google.zxing.common.HybridBinarizer
 import java.nio.ByteBuffer
 
 private val TAG = QrCodeAnalyzer::class.java.simpleName
 
-class QrCodeAnalyzer : ImageAnalysis.Analyzer {
+private fun ByteBuffer.toByteArray(): ByteArray {
+    rewind()
+    val data = ByteArray(remaining())
+    get(data)
+    return data
+}
+
+class QrCodeAnalyzer(
+    private val onQrCodesDetected: (qrCode: Result) -> Unit
+) : ImageAnalysis.Analyzer {
 
     private val yuvFormats = mutableListOf(YUV_420_888)
+
+    init {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            yuvFormats.addAll(listOf(YUV_420_888, YUV_420_888))
+        }
+    }
 
     private val reader = MultiFormatReader().apply {
         val map = mapOf(
@@ -23,25 +37,31 @@ class QrCodeAnalyzer : ImageAnalysis.Analyzer {
         setHints(map)
     }
 
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            yuvFormats.addAll(listOf(YUV_420_888, YUV_420_888))
-        }
-    }
-
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()
-        val data = ByteArray(remaining())
-        get(data)
-        return data
-    }
-
     override fun analyze(image: ImageProxy) {
         if (image.format !in yuvFormats) {
             Log.e(TAG, "Expected YUV, now = ${image.format}")
             return
         }
 
+        val data = image.planes[0].buffer.toByteArray()
+        val source = PlanarYUVLuminanceSource(
+            data,
+            image.width,
+            image.height,
+            0,
+            0,
+            image.width,
+            image.height,
+            false
+        )
+        val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+        try {
+            val result = reader.decode(binaryBitmap)
+            Log.d("QRCodeAnalyzer", result.text)
+        } catch (e: NotFoundException) {
+            e.printStackTrace()
+        }
+        image.close()
     }
 
 }
