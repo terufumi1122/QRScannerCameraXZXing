@@ -17,5 +17,8 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, ScanActivity::class.java))
         }
 
+        createQr.setOnClickListener {
+            startActivity(Intent(this, CreateQrActivity::class.java))
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.example.qrscannercameraxzxing
 
+import android.content.Context
 import android.graphics.ImageFormat.YUV_420_888
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.google.zxing.*
