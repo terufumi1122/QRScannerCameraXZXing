@@ -57,6 +57,7 @@ class QrCodeAnalyzer(
         val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
         try {
             val result = reader.decode(binaryBitmap)
+            onQrCodesDetected(result)
             Log.d("QRCodeAnalyzer", result.text)
         } catch (e: NotFoundException) {
             e.printStackTrace()
